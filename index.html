@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年11–12月每日任务 Checklist</title>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--text:#202633;--muted:#687386;--line:#e5e8ee;
+  --accent:#526f9d;--accent-soft:#edf2fa;--green:#27836b;--orange:#b97832;
+  --red:#b85a5a;--shadow:0 3px 14px rgba(25,35,55,.055);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,"Microsoft YaHei",sans-serif;line-height:1.55}
+header{background:#26364e;color:white;padding:28px 20px 24px}
+.wrap{max-width:1050px;margin:0 auto;padding:0 16px}
+h1{font-size:25px;margin:0 0 7px}
+header p{margin:0;color:#d8e0ec;font-size:14px}
+main{padding:20px 0 48px}
+.summary,.toolbar,.phase,.day{background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+.summary{padding:17px;margin-bottom:14px}
+.progress-head{display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:700}
+.progress-track{height:9px;background:#e9edf2;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.progress-fill{height:100%;width:0;background:var(--green);transition:width .2s}
+.small{font-size:12px;color:var(--muted)}
+.toolbar{padding:12px 14px;display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+button,select{font:inherit;border:1px solid var(--line);background:white;color:var(--text);padding:7px 11px;border-radius:8px;cursor:pointer}
+button:hover{background:var(--accent-soft)}
+select{margin-left:auto}
+.phase{padding:17px;margin:22px 0 12px}
+.phase h2{font-size:18px;margin:0 0 4px}
+.phase p{font-size:13px;color:var(--muted);margin:0}
+.days{display:grid;grid-template-columns:1fr;gap:10px}
+.day{overflow:hidden}
+.day summary{list-style:none;cursor:pointer;padding:13px 15px;display:flex;gap:12px;align-items:center}
+.day summary::-webkit-details-marker{display:none}
+.date{font-weight:700;min-width:118px}
+.daytitle{flex:1;font-size:14px}
+.daymeta{font-size:12px;color:var(--muted);white-space:nowrap}
+.day.done-day{border-color:#b7d9ce}
+.day.done-day summary{background:#f2faf7}
+.tasks{padding:0 16px 14px 145px}
+.task{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:14px}
+.task input{margin-top:4px;accent-color:var(--green);width:16px;height:16px;flex:0 0 auto}
+.task input:checked+span{text-decoration:line-through;color:#89919e}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-left:5px}
+.tag.urgent{background:#fff0ef;color:var(--red)}
+.tag.research{background:#eef7f4;color:var(--green)}
+.note{font-size:12px;color:var(--muted);padding:0 16px 13px 145px}
+@media(max-width:650px){
+ header{padding:22px 16px}h1{font-size:21px}
+ .day summary{flex-wrap:wrap;gap:5px 10px}
+ .date{min-width:100px}.daytitle{flex-basis:calc(100% - 115px)}
+ .daymeta{margin-left:110px}
+ .tasks,.note{padding-left:16px}
+ select{margin-left:0}
+}
+@media print{
+ body{background:white}.toolbar{display:none}.summary,.phase,.day{box-shadow:none;break-inside:avoid}
+ .day details{break-inside:avoid}.day summary{padding:8px}.tasks{padding-bottom:8px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>2026年11–12月每日任务 Checklist</h1>
+  <p>按日期逐项勾选；进度会保存在当前浏览器中。建议每天结束时检查并调整未完成事项。</p>
+</div></header>
+<main class="wrap">
+  <section class="summary">
+    <div class="progress-head"><span>整体完成进度</span><span id="progressText">0 / 0 项</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="small" id="progressPercent">0% 已完成</div>
+  </section>
+  <section class="toolbar">
+    <button id="expandAll">展开全部日期</button>
+    <button id="collapseAll">收起全部日期</button>
+    <button id="clearChecks">清空所有勾选</button>
+    <button onclick="window.print()">打印 / 保存为 PDF</button>
+    <select id="filter">
+      <option value="all">显示：全部任务</option>
+      <option value="incomplete">显示：仍有未完成任务的日期</option>
+      <option value="complete">显示：已完成的日期</option>
+    </select>
+  </section>
+  <div id="planner"></div>
+  <p class="small">说明：Final Exam 的具体日期尚未提供，因此12月计划暂按12月31日前完成两轮复习及模拟测试安排；如考试提前，请相应前移。Lab Report 2 的具体要求尚未提供，当前任务按“阅读要求、列提纲、完成初稿、检查提交”设置。</p>
+</main>
+<script>
+const phases = [
+{
+ title:"Phase 1｜11月1日–11月11日",
+ subtitle:"Molecular & Cellular Quiz 2（L6–9）＋ NS6001 研究方向准备",
+ days:[
+ ["2026-11-01","星期日","L6 Summary + PPT；初步构思 NS6001 研究题目",[
+ "阅读 Molecular & Cellular Lecture 6 总结，标记不熟悉的概念。",
+ "对照 Lecture 6 PPT，重点检查机制、实验方法和图示。",
+ "写下 NS6001 初步研究想法：Friends 剧集、event segmentation、encoding model、retrieval matrix。",
+ "列出目前对研究方向最不理解的 3–5 个问题。"]],
+ ["2026-11-02","星期一","L6 Anki＋Encoding Model 入门",[
+ "完成 Lecture 6 约70张 Anki flashcards（新卡＋复习卡）。",
+ "回顾 Lecture 6 PPT 中标记的薄弱知识点。",
+ "查阅 encoding model 的基础介绍，理解其基本研究目的与输入／输出。",
+ "记录研究所需的数据类型，以及目前尚不清楚的数据来源。"]],
+ ["2026-11-03","星期二","L7 Summary + PPT；Research reading",[
+ "阅读 Molecular & Cellular Lecture 7 总结。",
+ "对照 Lecture 7 PPT，整理核心概念与实验图示。",
+ "阅读 encoding model 相关基础文献或教程。",
+ "初步了解 event segmentation 与 episodic memory 的联系。"]],
+ ["2026-11-04","星期三","L7 Anki＋准备 Lab Meeting",[
+ "完成 Lecture 7 约70张 Anki flashcards（新卡＋复习卡）。",
+ "复习 Lecture 6–7 的 Anki 到期卡片。",
+ "准备 NS6001 研究想法的一页讨论提纲。",
+ "列出向 supervisor 询问的问题：研究可行性、数据、分析方法、五个月时间线。",
+ "准备讨论明年 RA 机会及 PhD 申请要求的问题。"]],
+ ["2026-11-05","星期四","Lab Meeting＋Supervisor discussion",[
+ "参加上午 Lab Meeting。",
+ "与 supervisor 讨论 NS6001 初步研究题目及五个月内的可行性。",
+ "确认实验室是否有 Friends 刺激材料、event annotations、neural data（如 fMRI）及 retrieval data。",
+ "询问 encoding model、retrieval matrix 或其他分析路线的适用性。",
+ "询问明年 RA 机会、所需技能，以及 RA 经历对未来 PhD 申请的帮助。",
+ "完成 Lecture 8 Summary。",
+ "会后整理 supervisor 的反馈、待办事项和研究方向修改。"]],
+ ["2026-11-06","星期五","L8 PPT + Anki；整理 Research feedback",[
+ "阅读 Lecture 8 PPT，补充 Lecture 8 总结。",
+ "完成 Lecture 8 约70张 Anki flashcards（新卡＋复习卡）。",
+ "复习 Lecture 6–8 的到期 Anki 卡片。",
+ "根据 supervisor feedback 修改 NS6001 研究方向与待确认问题。"]],
+ ["2026-11-07","星期六","L9 Summary + PPT；Event Segmentation",[
+ "阅读 Lecture 9 总结。",
+ "对照 Lecture 9 PPT，整理核心机制、概念和图示。",
+ "查阅 event segmentation 与记忆／事件边界相关文献。",
+ "记录 Friends episode 的 event segmentation annotations 可以支持哪些研究问题。"]],
+ ["2026-11-08","星期日","L9 Anki；联系 Academic Advisor",[
+ "完成 Lecture 9 约70张 Anki flashcards（新卡＋复习卡）。",
+ "复习 Lecture 6–9 的到期 Anki 卡片。",
+ "联系本科 academic advisor，提出约见请求并确认可行时间。",
+ "检查 L6–9 总结、PPT 和 Anki 是否均已覆盖。"]],
+ ["2026-11-09","星期一","L6–9 Anki 第二轮＋知识整合",[
+ "完成 Lecture 6–9 的 Anki 第二轮／到期卡片复习。",
+ "整理 L6–9 的高频概念、机制、实验方法和易混淆术语。",
+ "针对不熟悉的内容重新阅读对应 PPT 页面。",
+ "练习不看笔记解释每课的核心知识点。"]],
+ ["2026-11-10","星期二","Quiz 2 模拟与最后复习",[
+ "完成限时35分钟模拟：10道 MCQs（10分）＋2道 SAQs（10分）。",
+ "检查答案并整理错题及知识缺口。",
+ "复习 L6–9 中最薄弱的机制、实验方法和图示。",
+ "最后复习 L6–9 Anki 到期卡片；避免临时大量学习新内容。",
+ "准备考试所需物品与安排。"]],
+ ["2026-11-11","星期三","Molecular & Cellular Quiz 2",[
+ "参加 Molecular & Cellular Quiz 2（Lecture 6–9）。",
+ "考后记录不确定或容易混淆的题目，供 final exam 复习使用。",
+ "完成考试后休息；如有余力，简要浏览 NS5007 L1 内容。"]]
+]
+},
+{
+ title:"Phase 2｜11月12日–11月26日",
+ subtitle:"NS5007 L1–13 Closed-book Quiz＋NS6001 Progress Report＋NS5007 Project",
+ days:[
+ ["2026-11-12","星期四","NS5007 L1＋NS6001 文献搜索",[
+ "复习 NS5007 Lecture 1：Biological Intelligence、Brain、Attention、Memory、Learning、Python。",
+ "对照 PPT 补充重要英文术语及概念。",
+ "开始搜索 NS6001 研究方向的核心文献。",
+ "建立 literature matrix，记录作者、研究问题、设计、数据、方法、发现和局限。"]],
+ ["2026-11-13","星期五","NS5007 L2＋Literature Review",[
+ "复习 Lecture 2：AI history、types、data、curse of dimensionality、normality、preprocessing、visualization。",
+ "整理数据预处理与可视化的核心概念。",
+ "阅读 NS6001 核心文献并填写 literature matrix。",
+ "记录研究领域中已知结论与尚未解决的问题。"]],
+ ["2026-11-14","星期六","NS5007 L3＋Academic Advisor",[
+ "复习 Lecture 3：Regression and Classification、Linear Regression、Logistic Regression。",
+ "比较 regression 与 classification，以及 linear 与 logistic regression。",
+ "如已约好时间，与本科 academic advisor 会面；否则确认预约进度。",
+ "记录 advisor 对研究发展、RA 或 PhD 路径的建议（如适用）。"]],
+ ["2026-11-15","星期日","NS5007 L4＋研究问题",[
+ "复习 Lecture 4：Decision Tree、Ensemble Learning、Random Forest。",
+ "整理模型原理、优缺点及适用场景。",
+ "根据 supervisor feedback，拟定 NS6001 research question。",
+ "检查研究问题是否与可获得的数据及五个月周期匹配。"]],
+ ["2026-11-16","星期一","NS5007 L5＋Take-home Project",[
+ "复习 Lecture 5：Clustering and Ordination。",
+ "比较 clustering 与前面监督式学习方法的区别。",
+ "仔细阅读 NS5007 take-home project instructions，列出所有 deliverables。",
+ "确认项目数据、任务目标、使用工具和评分要求。",
+ "开始 Lab Report 1 准备：确认四张 dissection stage images 已保存且清晰。"]],
+ ["2026-11-17","星期二","NS5007 L6＋NS6001 Literature Review",[
+ "复习 Lecture 6：Neural Network Basics。",
+ "理解基本神经网络结构、输入层、隐藏层、输出层及训练概念。",
+ "阅读 NS6001 文献，补充理论背景和关键研究发现。",
+ "继续整理 Lab Report 1：查找常见 neuronal transfection methods 的可靠资料。"]],
+ ["2026-11-18","星期三","NS5007 L7＋Lab Report 1",[
+ "复习 Lecture 7：Model Selection、Data Partition、Cross-validation、Optimization、Regularization。",
+ "区分 training、validation、test sets 及 cross-validation。",
+ "整理 Lab Report 1 的四种 transfection methods 及各自特点。",
+ "继续完善 NS6001 literature matrix。"]],
+ ["2026-11-19","星期四","NS5007 L8＋NS6001 Future Plan",[
+ "复习 Lecture 8：CNN、Human Vision、CNN on Images。",
+ "理解 CNN 与视觉／object recognition 的联系。",
+ "拟定 NS6001 future plan：研究步骤、数据、分析、预期时间线和潜在限制。",
+ "完成 Lab Report 1 关于 dendritic spine morphology 的方法比较提纲。"]],
+ ["2026-11-20","星期五","NS5007 L9＋Take-home Project",[
+ "复习 Lecture 9：RNN、Human Language、Memory、RNN on EEG／language。",
+ "比较 RNN 与 CNN 的输入数据和应用场景。",
+ "开始 NS5007 project 的主要 coding／analysis／实践任务。",
+ "完成 Lab Report 1 第一版，核对四张图片及 transfection 方法答案。",
+ "检查 NS6001 report 所需文献是否足够。"]],
+ ["2026-11-21","星期六","NS5007 L10＋NS6001 Report",[
+ "复习 Lecture 10：Transformer、Human Attention、Transformer Model。",
+ "理解 attention mechanism 及 Transformer 的基本思路。",
+ "撰写 NS6001 Scientific Understanding／Literature Review 初稿。",
+ "继续 NS5007 project，记录代码、分析步骤和初步结果。",
+ "如已获得 Lab Report 2 要求，拆解评分标准并列出各部分任务。"]],
+ ["2026-11-22","星期日","NS5007 L11＋Report Future Plan",[
+ "复习 Lecture 11：Graph Neural Network、Brain Connectivity、Brain Graph。",
+ "理解图结构、节点、边及 GNN 在脑网络中的应用。",
+ "完成 NS6001 Future Plan 初稿。",
+ "继续 NS5007 project，检查分析流程与结果是否合理。",
+ "检查两份 Lab Reports 的材料、图片和参考文献准备情况。"]],
+ ["2026-11-23","星期一","NS5007 L12＋NS6001 修改",[
+ "复习 Lecture 12：Neuroimaging、Genomics、Healthcare、BCI、fMRI data。",
+ "整理 AI 在 neuroscience 和 healthcare 中的应用及限制。",
+ "修改 NS6001 literature review，突出研究问题、已有证据与研究缺口。",
+ "推进 NS5007 project 的主要分析及结果整理。",
+ "完成 Lab Report 2 的提纲或主要内容（根据实际要求调整）。"]],
+ ["2026-11-24","星期二","NS5007 L13＋Progress Report 完整初稿",[
+ "复习 Lecture 13：Reinforcement Learning、Reward、Animal Learning。",
+ "完成 NS5007 L1–13 第一轮复习。",
+ "整合 NS6001 Scientific Understanding、Literature Review 和 Future Plan，形成完整初稿。",
+ "推进 NS5007 project，整理结果、图表和解释。",
+ "检查 Lab Report 1 与 Lab Report 2 尚未完成的部分。"]],
+ ["2026-11-25","星期三","NS5007 综合模拟＋NS6001 检查",[
+ "进行 NS5007 L1–13 closed-book 综合测试。",
+ "根据测试结果复习薄弱知识点，重点检查模型比较与应用。",
+ "检查 NS6001 report 的科学准确性、逻辑、引用和 future plan。",
+ "检查 NS5007 project 是否已完成主要 coding／analysis。",
+ "确认 Lab Reports 能否在12月2日前完成。"]],
+ ["2026-11-26","星期四","NS5007 Closed-book Quiz",[
+ "进行 NS5007 Quiz 前最后一轮主动回忆和重点概念复习。",
+ "参加 NS5007 Human & Artificial Intelligence closed-book quiz（L1–13）。",
+ "考后休息。",
+ "确认 NS6001 Progress Report 和12月2日提交任务的剩余事项。"]]
+]
+},
+{
+ title:"Phase 3｜11月27日–12月6日",
+ subtitle:"NS6001 Progress Report、NS5007 Project、两份 Lab Reports、NS5001 Proposal",
+ days:[
+ ["2026-11-27","星期五","NS6001 最终修改＋Lab Reports",[
+ "完成 NS6001 Progress Report 最终修改，检查 literature review 和 future plan。",
+ "核对 NS6001 文献引用、格式、科学表述和提交文件。",
+ "完成 Lab Report 1 的图片、四种 transfection methods 及方法选择解释。",
+ "检查 Lab Report 2 的评分要求与完成情况。",
+ "确认 NS5007 project 的剩余工作及提交格式。"]],
+ ["2026-11-28","星期六","NS6001 Progress Report DDL",[
+ "提交 NS6001 Progress Report（20%）。",
+ "确认提交成功并保存最终版本。",
+ "推进 Lab Report 1／Lab Report 2 尚未完成的部分。",
+ "检查 NS5007 take-home project 的代码、分析结果和报告结构。"]],
+ ["2026-11-29","星期日","NS5007 Project＋Lab Report 2",[
+ "完成 NS5007 take-home project 的主要内容与结果整理。",
+ "检查代码、数据处理、train/test split、模型评估及结果解释（如适用）。",
+ "完成 Lab Report 2 的主要写作内容。",
+ "核对 Lab Report 1 的图片、答案和引用。"]],
+ ["2026-11-30","星期一","Lab Report 1＋NS5001 Proposal",[
+ "完成 Lab Report 1 完整版本。",
+ "检查 Lab Report 1 是否逐项回应评分要求及字数／格式要求。",
+ "完成 NS5001 Proposal 的 Objectives。",
+ "列出 NS5001 Research Background 的主要论点与核心文献。",
+ "检查 Lab Report 2 的完整性。"]],
+ ["2026-12-01","星期二","两份 Lab Reports＋NS5007 最终检查",[
+ "完成 Lab Report 1 最终校对。",
+ "完成 Lab Report 2 最终校对。",
+ "检查两份 Lab Reports 的文件格式、图片、引用和提交要求。",
+ "完成 NS5007 project 最终检查：代码可运行、图表完整、解释准确、文件齐全。",
+ "为12月2日提交准备最终文件。"]],
+ ["2026-12-02","星期三","三个提交任务 DDL",[
+ "提交 NS5007 Human & Artificial Intelligence take-home project。",
+ "提交 NS5004 Molecular and Cellular Neuroscience Lab Report 1。",
+ "提交 NS5004 Molecular and Cellular Neuroscience Lab Report 2。",
+ "逐一确认三个任务均提交成功并保存确认记录。",
+ "开始 NS5001 Proposal：整理 Research Background。"]],
+ ["2026-12-03","星期四","NS5001 Proposal：Background＋Methodology",[
+ "完成 NS5001 Research Background 初稿。",
+ "完成 Research Plan and Methodology 初稿。",
+ "完成 Preliminary／Expected Preliminary Results 部分。",
+ "检查 Objectives、研究问题、方法和预期结果是否一致。"]],
+ ["2026-12-04","星期五","NS5001 Proposal：Figures＋References＋AI",[
+ "制作或整理 proposal 所需 Figures，并确保图示与研究设计一致。",
+ "整理 References，检查文内引用与参考文献列表。",
+ "完成 Role of AI 部分，准确说明 AI 的使用方式与范围。",
+ "检查 Methodology 的可行性、变量、测量和分析计划。"]],
+ ["2026-12-05","星期六","NS5001 Proposal 整合与最终修改",[
+ "整合 Title、Abstract、Objectives、Background、Expected Results、Methodology、Figures、References 和 Role of AI。",
+ "根据完整 proposal 重写或完善 Abstract。",
+ "检查全文逻辑、科学准确性、格式、引用及图表编号。",
+ "确认所有九个指定组成部分均已包含。",
+ "准备12月6日提交的最终文件。"]],
+ ["2026-12-06","星期日","NS5001 Research Proposal DDL",[
+ "提交 NS5001 Research Proposal。",
+ "确认提交成功并保存最终版本。",
+ "整理本阶段所有课程作业的提交记录。",
+ "完成 deadline 后休息，为 Molecular & Cellular Final Exam 复习做准备。"]]
+]
+},
+{
+ title:"Phase 4｜12月7日–12月31日",
+ subtitle:"Molecular & Cellular Neuroscience Final Exam（L1–12）系统复习",
+ days:[
+ ["2026-12-07","星期一","Final：L1 第一轮",[
+ "复习 Lecture 1 Summary。",
+ "重新阅读 Lecture 1 PPT，检查重要概念、机制和图示。",
+ "完成 Lecture 1 Anki 到期卡片。",
+ "整理 L1 的薄弱知识点。"]],
+ ["2026-12-08","星期二","Final：L2 第一轮",[
+ "复习 Lecture 2 Summary。",
+ "重新阅读 Lecture 2 PPT。",
+ "完成 Lecture 2 Anki 到期卡片。",
+ "主动回忆 L1–2 的核心概念。"]],
+ ["2026-12-09","星期三","Final：L3 第一轮",[
+ "复习 Lecture 3 Summary。",
+ "重新阅读 Lecture 3 PPT，重点理解机制和实验图示。",
+ "完成 Lecture 3 Anki 到期卡片。",
+ "整理 L1–3 易混淆概念。"]],
+ ["2026-12-10","星期四","Final：L4 第一轮",[
+ "复习 Lecture 4 Summary。",
+ "重新阅读 Lecture 4 PPT。",
+ "完成 Lecture 4 Anki 到期卡片。",
+ "主动回忆 L3–4 的重要机制。"]],
+ ["2026-12-11","星期五","Final：L5 第一轮",[
+ "复习 Lecture 5 Summary。",
+ "重新阅读 Lecture 5 PPT。",
+ "完成 Lecture 5 Anki 到期卡片。",
+ "回顾 L1–5 的知识框架并标记薄弱部分。"]],
+ ["2026-12-12","星期六","Final：L6 第一轮",[
+ "复习 Lecture 6 Summary。",
+ "重新阅读 Lecture 6 PPT，重点检查机制、实验方法和图示。",
+ "完成 Lecture 6 Anki 到期卡片。",
+ "整理 L6 与其他 lectures 的知识联系。"]],
+ ["2026-12-13","星期日","Final：L7 第一轮",[
+ "复习 Lecture 7 Summary。",
+ "重新阅读 Lecture 7 PPT。",
+ "完成 Lecture 7 Anki 到期卡片。",
+ "主动回忆 L6–7 的核心概念。"]],
+ ["2026-12-14","星期一","Final：L8 第一轮",[
+ "复习 Lecture 8 Summary。",
+ "重新阅读 Lecture 8 PPT，重点检查离子通道／相关机制及实验图示（以课程内容为准）。",
+ "完成 Lecture 8 Anki 到期卡片。",
+ "整理 L8 的薄弱知识点。"]],
+ ["2026-12-15","星期二","Final：L9 第一轮",[
+ "复习 Lecture 9 Summary。",
+ "重新阅读 Lecture 9 PPT。",
+ "完成 Lecture 9 Anki 到期卡片。",
+ "回顾 L6–9 的重点机制与实验方法。"]],
+ ["2026-12-16","星期三","Final：L10 第一轮",[
+ "复习 Lecture 10 Summary。",
+ "重新阅读 Lecture 10 PPT。",
+ "完成 Lecture 10 Anki 到期卡片。",
+ "整理 L10 的核心概念与图示。"]],
+ ["2026-12-17","星期四","Final：L11 第一轮",[
+ "复习 Lecture 11 Summary。",
+ "重新阅读 Lecture 11 PPT。",
+ "完成 Lecture 11 Anki 到期卡片。",
+ "主动回忆 L10–11 的重点知识。"]],
+ ["2026-12-18","星期五","Final：L12 第一轮",[
+ "复习 Lecture 12 Summary。",
+ "重新阅读 Lecture 12 PPT。",
+ "完成 Lecture 12 Anki 到期卡片。",
+ "检查 L1–12 第一轮复习是否全部完成，并列出最薄弱的 5 个主题。"]],
+ ["2026-12-19","星期六","Final：L1–4 第二轮",[
+ "不看笔记，主动回忆 L1–4 的主要概念和机制。",
+ "重新检查 L1–4 重要实验、图示及结果解释。",
+ "完成 L1–4 Anki 到期卡片。",
+ "练习 L1–4 相关 MCQs 和 SAQs。",
+ "记录错题与需要回看的 PPT 页面。"]],
+ ["2026-12-20","星期日","Final：L5–8 第二轮",[
+ "不看笔记，主动回忆 L5–8 的主要概念和机制。",
+ "重新检查 L5–8 重要实验、图示及结果解释。",
+ "完成 L5–8 Anki 到期卡片。",
+ "练习 L5–8 相关 MCQs 和 SAQs。",
+ "记录错题与需要回看的 PPT 页面。"]],
+ ["2026-12-21","星期一","Final：L9–12 第二轮",[
+ "不看笔记，主动回忆 L9–12 的主要概念和机制。",
+ "重新检查 L9–12 重要实验、图示及结果解释。",
+ "完成 L9–12 Anki 到期卡片。",
+ "练习 L9–12 相关 MCQs 和 SAQs。",
+ "记录错题与需要回看的 PPT 页面。"]],
+ ["2026-12-22","星期二","Final：L1–4 实验与机制强化",[
+ "集中复习 L1–4 最薄弱的机制和实验方法。",
+ "练习解释重要实验的研究问题、设计、结果和结论。",
+ "复习相关图示，尝试不看答案解释各部分。",
+ "整理并修正 L1–4 错题。"]],
+ ["2026-12-23","星期三","Final：L5–8 实验与机制强化",[
+ "集中复习 L5–8 最薄弱的机制和实验方法。",
+ "练习解释重要实验的研究问题、设计、结果和结论。",
+ "复习相关图示，尝试不看答案解释各部分。",
+ "整理并修正 L5–8 错题。"]],
+ ["2026-12-24","星期四","Final：L9–12 实验与机制强化",[
+ "集中复习 L9–12 最薄弱的机制和实验方法。",
+ "练习解释重要实验的研究问题、设计、结果和结论。",
+ "复习相关图示，尝试不看答案解释各部分。",
+ "整理并修正 L9–12 错题。"]],
+ ["2026-12-25","星期五","轻量复习＋休息",[
+ "完成少量 Anki 到期卡片。",
+ "快速回顾最重要的概念清单，不安排大量新内容。",
+ "休息并保持规律作息。"]],
+ ["2026-12-26","星期六","Final：L1–6 综合测试",[
+ "进行 L1–6 综合 MCQs／SAQs 测试。",
+ "检查答案并分析错误原因：知识遗忘、概念混淆或题目理解错误。",
+ "回到对应 PPT 页面修正薄弱知识点。",
+ "更新错题清单。"]],
+ ["2026-12-27","星期日","Final：L7–12 综合测试",[
+ "进行 L7–12 综合 MCQs／SAQs 测试。",
+ "检查答案并分析错误原因。",
+ "回到对应 PPT 页面修正薄弱知识点。",
+ "更新错题清单。"]],
+ ["2026-12-28","星期一","Molecular & Cellular Mock Exam 1",[
+ "完成一套覆盖 L1–12 的模拟考试。",
+ "尽可能按照正式考试时间与题型完成 MCQs 和 SAQs。",
+ "记录各 lecture 的得分与薄弱主题。",
+ "整理最需要优先修正的问题。"]],
+ ["2026-12-29","星期二","Mock Exam 1 错题分析",[
+ "逐题分析 Mock Exam 1 的错误及不确定答案。",
+ "针对薄弱主题重新阅读 Summary 和 PPT。",
+ "复习对应 Anki 卡片。",
+ "练习用准确的 scientific terminology 解释关键机制。"]],
+ ["2026-12-30","星期三","Molecular & Cellular Mock Exam 2",[
+ "完成第二套覆盖 L1–12 的模拟考试。",
+ "比较两次模拟考试的表现，确认是否仍有明显薄弱主题。",
+ "检查 SAQ 答案是否完整、逻辑清楚且术语准确。",
+ "整理 final exam 前最后需要复习的内容。"]],
+ ["2026-12-31","星期四","Final：L1–12 年末总复习",[
+ "快速回顾 L1–12 全部知识框架。",
+ "检查错题清单及最薄弱的机制、实验和图示。",
+ "完成必要的 Anki 到期卡片复习。",
+ "确认 Final Exam 实际日期；若考试早于12月31日，按考试日期提前完成相应复习。",
+ "整理 final exam revision notes。"]]
+]
+}
+];
+
+const planner=document.getElementById('planner');
+let total=0;
+phases.forEach((phase,pi)=>{
+  const section=document.createElement('section');
+  section.innerHTML=`<div class="phase"><h2>${phase.title}</h2><p>${phase.subtitle}</p></div>`;
+  const days=document.createElement('div');days.className='days';
+  phase.days.forEach((d,di)=>{
+    const id=`${pi}-${di}`;
+    const detail=document.createElement('details');detail.className='day';detail.dataset.day=id;
+    const summary=document.createElement('summary');
+    summary.innerHTML=`<span class="date">${d[0].slice(5).replace('-','/')}（${d[1].replace('星期','周')}）</span><span class="daytitle">${d[2]}</span><span class="daymeta"><span class="daycount">0/${d[3].length}</span> 完成</span>`;
+    const taskBox=document.createElement('div');taskBox.className='tasks';
+    d[3].forEach((task,ti)=>{
+      total++;
+      const key=`novdec26-${id}-${ti}`;
+      const label=document.createElement('label');label.className='task';
+      label.innerHTML=`<input type="checkbox" data-key="${key}"><span></span>`;
+      label.querySelector('span').textContent=task;
+      taskBox.appendChild(label);
+    });
+    detail.append(summary,taskBox);days.appendChild(detail);
+  });
+  section.appendChild(days);planner.appendChild(section);
+});
+
+const boxes=[...document.querySelectorAll('input[type=checkbox]')];
+function refresh(){
+  let checked=0;
+  document.querySelectorAll('.day').forEach(day=>{
+    const inputs=[...day.querySelectorAll('input')];
+    const n=inputs.filter(x=>x.checked).length;
+    checked+=n;
+    day.querySelector('.daycount').textContent=`${n}/${inputs.length}`;
+    day.classList.toggle('done-day',n===inputs.length);
+  });
+  document.getElementById('progressText').textContent=`${checked} / ${total} 项`;
+  const pct=Math.round(checked/total*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPercent').textContent=`${pct}% 已完成`;
+}
+boxes.forEach(box=>{
+  const saved=localStorage.getItem(box.dataset.key);
+  box.checked=saved==='1';
+  box.addEventListener('change',()=>{
+    localStorage.setItem(box.dataset.key,box.checked?'1':'0');refresh();applyFilter();
+  });
+});
+function applyFilter(){
+  const f=document.getElementById('filter').value;
+  document.querySelectorAll('.day').forEach(day=>{
+    const inputs=[...day.querySelectorAll('input')];
+    const complete=inputs.every(x=>x.checked);
+    day.style.display=(f==='all'||(f==='complete'&&complete)||(f==='incomplete'&&!complete))?'':'none';
+  });
+}
+document.getElementById('filter').addEventListener('change',applyFilter);
+document.getElementById('expandAll').onclick=()=>document.querySelectorAll('.day').forEach(d=>d.open=true);
+document.getElementById('collapseAll').onclick=()=>document.querySelectorAll('.day').forEach(d=>d.open=false);
+document.getElementById('clearChecks').onclick=()=>{
+  if(confirm('确定清空所有已勾选任务吗？此操作无法撤销。')){
+    boxes.forEach(b=>{b.checked=false;localStorage.removeItem(b.dataset.key)});
+    refresh();applyFilter();
+  }
+};
+refresh();
+</script>
+</body>
+</html>
